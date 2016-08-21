@@ -7,8 +7,7 @@ import uniout
 import re
 from pymongo import MongoClient
 from threading import Thread
-
-
+import sys
 
 # global variable
 INDEX_URL = 'http://appstore.huawei.com/more/all/%d'
@@ -83,11 +82,11 @@ class Huawei_Crawler(object):
 
         app_name = tree.xpath('//div[@class="app-info flt"]/ul/li/p/span[@class="title"]/text()')[0]
 
-        download_times = self.extract_data('.*?([0-9]+).*?', \
-                tree.xpath('//div[@class="app-info flt"]/ul/li/p/span[@class="grey sub"]/text()')[0])
+        download_times = int(self.extract_data('.*?([0-9]+).*?', \
+                tree.xpath('//div[@class="app-info flt"]/ul/li/p/span[@class="grey sub"]/text()')[0]))
 
-        rate = self.extract_data('score_(.*?)$', \
-                tree.xpath('//div[@class="app-info flt"]/ul/li[last()]/p[last()]/span/@class')[0])
+        rate = int(self.extract_data('score_(.*?)$', \
+                tree.xpath('//div[@class="app-info flt"]/ul/li[last()]/p[last()]/span/@class')[0]))
 
         download_url = self.extract_data('.*?\'(http://.*?)\'', \
                 tree.xpath('//div[@class="app-function nofloat"]/a[last()]/@onclick')[0].replace('\n', ''))
@@ -113,8 +112,8 @@ class Huawei_Crawler(object):
 
         info['app_name'] = app_name
         info['icon_url'] = icon_url
-        info['download_times'] = download_times
-        info['rate'] = rate
+        info['download_times'] = int(download_times)
+        info['rate'] = int(rate)
         info['download_url'] = download_url
         info['category'] = category
         info['full_intro'] = full_intro
@@ -123,12 +122,6 @@ class Huawei_Crawler(object):
         info['app_img'] = app_img
 
         print app_name
-
-        # for thread in threads:
-        #     thread.start()
-        #
-        # for thread in threads:
-        #     thread.join()
 
         self.apps.insert_one(info)
 
@@ -146,9 +139,13 @@ class Huawei_Crawler(object):
 
 if __name__ == '__main__':
     c = Huawei_Crawler()
-    for i in xrange(1, 42):
-        print '------------------------' + str(i) + '--------------------------'
-        c.get_app_list(i)
+
+    if len(sys.argv) == 1:
+        for i in xrange(1, 42):
+            print '------------------------' + str(i) + '--------------------------'
+            c.get_app_list(i)
+    elif len(sys.argv) == 2:
+        c.get_app_by_id(sys.argv[1])
     # c.get_app_details('http://appstore.huawei.com/app/C32569')
     # thread.start_new_thread(c.get_app_details, ('http://appstore.huawei.com/app/C32569', ))
     # c.get_app_by_id('C10068705')

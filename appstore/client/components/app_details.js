@@ -2,7 +2,7 @@ import React from 'react';
 import AppTitle from './app_title';
 import AppImage from './app_images';
 import AppIntro from './app_intro';
-import AppList from './applist';
+import RecommAppList from './recomm_app_list';
 
 const AppDetail = ({ app }) => {
   return (
@@ -16,8 +16,7 @@ const AppDetail = ({ app }) => {
         <div className="title_bar">
           <font className="bar_title">相关推荐</font>
         </div>
-
-        <AppList app={ app }/>
+        <RecommAppList app={ app }/>
       </div>
     </div>
   );
